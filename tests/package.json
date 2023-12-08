@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "eoslime": "^2.0.0"
+    "eoslime": "^2.0.1",
+    "mocha": "^10.2.0"
   }
 }
