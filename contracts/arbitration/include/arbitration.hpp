@@ -1,7 +1,7 @@
 // Example contract that can create, update, and delete tasks.
 //
 // @author Awesome Developer Person
-// @contract todo
+// @contract arbitration
 // @version v1.1.0
 
 #include <eosio/eosio.hpp>
@@ -11,12 +11,12 @@
 using namespace std;
 using namespace eosio;
 
-CONTRACT todo : public contract
+CONTRACT arbitration : public contract
 {
     public:
 
-    todo(name self, name code, datastream<const char*> ds) : contract(self, code, ds) {};
-    ~todo() {};
+    arbitration(name self, name code, datastream<const char*> ds) : contract(self, code, ds) {};
+    ~arbitration() {};
 
     //======================== config actions ========================
 

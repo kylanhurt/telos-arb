@@ -1,8 +1,8 @@
-#include "../include/todo.hpp"
+#include "../include/arbitration.hpp"
 
 //======================== config actions ========================
 
-ACTION todo::init(string contract_name, string contract_version, name initial_admin)
+ACTION arbitration::init(string contract_name, string contract_version, name initial_admin)
 {
     //authenticate
     require_auth(get_self());
@@ -25,7 +25,7 @@ ACTION todo::init(string contract_name, string contract_version, name initial_ad
     configs.set(new_conf, get_self());
 }
 
-ACTION todo::setversion(string new_version)
+ACTION arbitration::setversion(string new_version)
 {
     //get config
     config_table configs(get_self(), get_self().value);
@@ -41,7 +41,7 @@ ACTION todo::setversion(string new_version)
     configs.set(conf, get_self());
 }
 
-ACTION todo::setadmin(name new_admin)
+ACTION arbitration::setadmin(name new_admin)
 {
     //open config table, get config
     config_table configs(get_self(), get_self().value);
@@ -62,7 +62,7 @@ ACTION todo::setadmin(name new_admin)
 
 //======================== task actions ========================
 
-ACTION todo::createtask(name creator, string initial_message)
+ACTION arbitration::createtask(name creator, string initial_message)
 {
     //authenticate
     require_auth(creator);
@@ -87,7 +87,7 @@ ACTION todo::createtask(name creator, string initial_message)
     // )).send();
 }
 
-ACTION todo::updatemsg(name creator, uint64_t task_id, string new_message)
+ACTION arbitration::updatemsg(name creator, uint64_t task_id, string new_message)
 {
     //authenticate
     require_auth(creator);
@@ -102,7 +102,7 @@ ACTION todo::updatemsg(name creator, uint64_t task_id, string new_message)
     });
 }
 
-ACTION todo::completetask(name creator, uint64_t task_id)
+ACTION arbitration::completetask(name creator, uint64_t task_id)
 {
     //authenticate
     require_auth(creator);
@@ -120,7 +120,7 @@ ACTION todo::completetask(name creator, uint64_t task_id)
     });
 }
 
-ACTION todo::deletetask(name creator, uint64_t task_id)
+ACTION arbitration::deletetask(name creator, uint64_t task_id)
 {
     //authenticate
     require_auth(creator);
@@ -133,7 +133,7 @@ ACTION todo::deletetask(name creator, uint64_t task_id)
     tasks.erase(t);
 }
 
-// ACTION todo::logtaskid(uint64_t new_task_id)
+// ACTION arbitration::logtaskid(uint64_t new_task_id)
 // {
 //     //authenticate
 //     check(get_self());

@@ -1,12 +1,12 @@
 #! /bin/bash
 
 #contract
-if [[ "$1" == "todo" ]]; then
-    contract=todo
-else
-    echo "need contract"
-    exit 0
-fi
+# if [[ "$1" == "arbitration" ]]; then
+    contract=arbitration
+# else
+#     echo "need contract"
+#     exit 0
+# fi
 
 echo ">>> Building $contract contract..."
 
