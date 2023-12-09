@@ -131,4 +131,27 @@ describe("Case files", function () {
             assert(JSON.parse(err).error.name == 'eosio_assert_message_exception', "filecase() should not accept invalid category");
         }              
     })
+
+    describe('Handles arbitrator approval by respondant correctly', async () => {
+        it('Non-respondant cannot accept arb', async () => {
+            try {
+                await arbitrationContract.actions.acceptarb([def.respondant, 0], { from: claimantAccount })
+            } catch (err) {
+                assert(JSON.parse(err).error.name == 'missing_auth_exception', "acceptarb() should not be accepted by non-respondant");
+            }
+            
+            try {
+                await arbitrationContract.actions.acceptarb([def.claimant, 0], { from: claimantAccount })
+            } catch (err) {
+                assert(JSON.parse(err).error.name == 'eosio_assert_message_exception', "acceptarb() should not be accepted by non-respondant");
+            }                
+        })
+
+        it('Respondant accepts arb', async () => {
+            const res = await arbitrationContract.actions.acceptarb([def.respondant, 0], { from: respondantAccount })
+            assert(res.processed.receipt.status == 'executed', "acceptarb() action not executed");
+            const claims = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
+            assert(claims[0].case_status == 1, 'acceptarb() should progress case status by 1')
+        })
+    })
 });
