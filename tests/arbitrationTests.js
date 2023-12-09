@@ -13,6 +13,7 @@ describe("Arbitration Tests", function () {
     this.timeout(15000);
     let arbitrationAccount
     let testAccount1
+    let temporaryAdmin
     let admin
 
     //base tester
@@ -21,6 +22,7 @@ describe("Arbitration Tests", function () {
         arbitrationAccount = await eoslime.Account.createFromName("arbitration")
         testAccount1 = await eoslime.Account.createFromName("testaccount1");
         adminAccount = await eoslime.Account.createFromName('admin')
+        temporaryAdmin = await eoslime.Account.createRandom();
 
 
         //deploy arbitration contract
@@ -46,8 +48,6 @@ describe("Arbitration Tests", function () {
 
     it("Sets admin", async () => {
         //call setadmin() on arbitration contract
-
-        const temporaryAdmin = await eoslime.Account.createRandom();
         const tempRes = await arbitrationContract.actions.setadmin([temporaryAdmin.name], {from: arbitrationAccount});
         assert(tempRes.processed.receipt.status == 'executed', "setadmin() action not executed");
 
@@ -60,7 +60,14 @@ describe("Arbitration Tests", function () {
 
         //assert config table created
         const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
-        assert(conf[0].admin == adminAccount.name, "Incorrect Admin");        
+        assert(conf[0].admin == adminAccount.name, "Incorrect Admin");
+
+        // assert non-admin cannot set new admin
+        try {
+            const _invalidRes = await arbitrationContract.actions.setadmin([temporaryAdmin.name], {from: temporaryAdmin});
+        } catch (err) {
+            assert(JSON.parse(err).error.name == 'missing_auth_exception', "setadmin() action not failed with invalid authority");
+        }
     })    
 
     it("Sets version", async () => {
@@ -71,6 +78,13 @@ describe("Arbitration Tests", function () {
         //assert table values
         const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
         assert(conf[0].contract_version == newVersion, "Incorrect Contract Version");
+
+        // assert non-admin cannot set new version
+        try {
+            const _invalidRes = await arbitrationContract.actions.setversion([newVersion], {from: temporaryAdmin});
+        } catch (err) {
+            assert(JSON.parse(err).error.name == 'eosio_assert_message_exception', "setversion() action not failed with invalid authority");
+        }
     })
 
     it("Set config", async () => {
@@ -87,6 +101,14 @@ describe("Arbitration Tests", function () {
         const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
         assert(conf[0].fee_usd == newFee, "Incorrect fee amount");
         assert(conf[0].max_claims_per_case == newNumClaims, "Incorrect max_claims_per_case");
+
+        // assert non-admin cannot set config
+        try {
+            const _invalidRes = await arbitrationContract.actions.setconfig([newNumClaims, newFee], {from: temporaryAdmin});
+        } catch (err) {
+            console.log('err', err)
+            assert(JSON.parse(err).error.name == 'missing_auth_exception', "setconfig() action not failed with invalid authority");
+        }        
     });
 
     // it("Create Task", async () => {
