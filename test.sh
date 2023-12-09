@@ -18,7 +18,7 @@ echo ">>> Testing $contract contract..."
 eoslime nodeos start
 
 #run test suite
-mocha tests/arbitrationTests.js
+mocha tests/configTests.js
 
 #stop nodeos
 eoslime nodeos stop
