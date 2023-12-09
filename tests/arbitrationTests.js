@@ -64,7 +64,7 @@ describe("Arbitration Tests", function () {
 
         // assert non-admin cannot set new admin
         try {
-            const _invalidRes = await arbitrationContract.actions.setadmin([temporaryAdmin.name], {from: temporaryAdmin});
+            await arbitrationContract.actions.setadmin([temporaryAdmin.name], {from: temporaryAdmin});
         } catch (err) {
             assert(JSON.parse(err).error.name == 'missing_auth_exception', "setadmin() action not failed with invalid authority");
         }
@@ -81,7 +81,7 @@ describe("Arbitration Tests", function () {
 
         // assert non-admin cannot set new version
         try {
-            const _invalidRes = await arbitrationContract.actions.setversion([newVersion], {from: temporaryAdmin});
+            await arbitrationContract.actions.setversion([newVersion], {from: temporaryAdmin});
         } catch (err) {
             assert(JSON.parse(err).error.name == 'eosio_assert_message_exception', "setversion() action not failed with invalid authority");
         }
@@ -104,9 +104,8 @@ describe("Arbitration Tests", function () {
 
         // assert non-admin cannot set config
         try {
-            const _invalidRes = await arbitrationContract.actions.setconfig([newNumClaims, newFee], {from: temporaryAdmin});
+            await arbitrationContract.actions.setconfig([newNumClaims, newFee], {from: temporaryAdmin});
         } catch (err) {
-            console.log('err', err)
             assert(JSON.parse(err).error.name == 'missing_auth_exception', "setconfig() action not failed with invalid authority");
         }        
     });
