@@ -69,6 +69,20 @@ describe("Case files", function () {
             approvals: [],
             update_ts: caseFiles[0].update_ts // hard to test this so set to correct value
         }, 'Invalid new casefile data')
+
+        // now also check 'claims' table
+        const claims = await arbitrationContract.provider.select('claims').from('arbitration').scope('0').find();
+        assert.deepEqual(claims[0], {
+            ...claims[0],
+            claim_id: 0,
+            claim_summary: def.claim_link,
+            decision_link: '',
+            response_link: '',
+            claim_info_needed: 0,
+            response_info_needed: 0,
+            status: 1,
+            claim_category: def.claim_category,
+        }, 'Claim data incorrect')
     })
 
     it("Rejects invalid file case info", async () => {
