@@ -35,7 +35,7 @@ describe("Arbitration Tests", function () {
 
     it("Initializes", async () => {
         //call init() on arbitration contract
-        const res = await arbitrationContract.actions.init(["arbitration", "v0.1.0", arbitrationAccount.name], {from: arbitrationAccount});
+        const res = await arbitrationContract.actions.init([arbitrationAccount.name], {from: arbitrationAccount});
         assert(res.processed.receipt.status == 'executed', "init() action not executed");
 
         //assert config table created
@@ -44,8 +44,17 @@ describe("Arbitration Tests", function () {
     })
 
     it("Sets admin", async () => {
-        //call init() on arbitration contract
-        const res = await arbitrationContract.actions.setadmin([adminAccount.name], {from: arbitrationAccount});
+        //call setadmin() on arbitration contract
+
+        const temporaryAdmin = await eoslime.Account.createRandom();
+        const tempRes = await arbitrationContract.actions.setadmin([temporaryAdmin.name], {from: arbitrationAccount});
+        assert(tempRes.processed.receipt.status == 'executed', "setadmin() action not executed");
+
+        //assert config table created
+        const tempConfig = await arbitrationContract.provider.select('config').from('arbitration').find();
+        assert(tempConfig[0].admin == temporaryAdmin.name, "Incorrect Admin");        
+
+        const res = await arbitrationContract.actions.setadmin([adminAccount.name], {from: temporaryAdmin});
         assert(res.processed.receipt.status == 'executed', "setadmin() action not executed");
 
         //assert config table created
