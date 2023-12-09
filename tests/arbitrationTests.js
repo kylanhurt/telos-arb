@@ -19,7 +19,7 @@ describe("Arbitration Tests", function () {
         //create blockchain accounts
         arbitrationAccount = await eoslime.Account.createFromName("arbitration")
         testAccount1 = await eoslime.Account.createFromName("testaccount1");
-        admin = await eoslime.Account.createFromName('admin')
+        adminAccount = await eoslime.Account.createFromName('admin')
 
 
         //deploy arbitration contract
@@ -42,6 +42,16 @@ describe("Arbitration Tests", function () {
         const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
         assert(conf[0].admin == arbitrationAccount.name, "Incorrect Admin");        
     })
+
+    it("Sets admin", async () => {
+        //call init() on arbitration contract
+        const res = await arbitrationContract.actions.setadmin([adminAccount.name], {from: arbitrationAccount});
+        assert(res.processed.receipt.status == 'executed', "setadmin() action not executed");
+
+        //assert config table created
+        const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
+        assert(conf[0].admin == adminAccount.name, "Incorrect Admin");        
+    })    
 
     it("Change Version", async () => {
         //initialize
