@@ -57,13 +57,18 @@ describe("Case files", function () {
         assert(res.processed.receipt.status == 'executed', "filecase() action not executed")
 
         const caseFiles = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
-        assert(caseFiles[0].claimant == claimantAccount.name, "Incorrect claimant");
-        assert(caseFiles[0].respondant == respondantAccount.name, "Incorrect respondant");
-        assert(caseFiles[0].case_id == 0, "Incorrect case ID");
-        assert(caseFiles[0].case_status == 0, "Incorrect case status");
-        assert(caseFiles[0].number_claims == 1, "Incorrect case number_claims");
-        assert(caseFiles[0].fee_paid_tlos == '0.0000 TLOS', "Incorrect case fee_paid_tlos");
-        assert(caseFiles[0].approvals.length == 0, "Incorrect case approvals");
+        assert.deepEqual(caseFiles[0], {
+            claimant: claimantAccount.name,
+            respondant: respondantAccount.name,
+            arbitrator: arbitratorAccount.name,
+            case_id: 0,
+            case_ruling: '',
+            case_status: 0,
+            number_claims: 1,
+            fee_paid_tlos: "0.0000 TLOS",
+            approvals: [],
+            update_ts: caseFiles[0].update_ts // hard to test this so set to correct value
+        }, 'Invalid new casefile data')
     })
 
     it("Rejects invalid file case info", async () => {
