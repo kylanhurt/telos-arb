@@ -1,5 +1,6 @@
 //eoslime
 const eoslime = require("eoslime").init("local");
+const { faker } = require('@faker-js/faker')
 const assert = require('assert');
 const { CLIENT_RENEG_LIMIT } = require("tls");
 
@@ -62,31 +63,31 @@ describe("Arbitration Tests", function () {
         assert(conf[0].admin == adminAccount.name, "Incorrect Admin");        
     })    
 
-    it("Change Version", async () => {
-        //initialize
-        const newVersion = "0.2.0";
-
-        //call setversion() on arbitration contract
-        const res = await arbitrationContract.actions.setversion([newVersion], {from: arbitrationAccount});
+    it("Sets version", async () => {
+        const newVersion = faker.lorem.word({ min: 1, max: 10 })
+        const res = await arbitrationContract.actions.setversion([newVersion], { from: adminAccount })
         assert(res.processed.receipt.status == 'executed', "setversion() action not executed");
 
         //assert table values
         const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
         assert(conf[0].contract_version == newVersion, "Incorrect Contract Version");
+    })
+
+    it("Set config", async () => {
+        //initialize
+        const randNum = Math.floor(Math.random() * 999) / 100
+        const newFee = randNum.toFixed(4) + " USD"
+        const newNumClaims = Math.floor(Math.random() * 100)
+
+        //call setversion() on arbitration contract
+        const res = await arbitrationContract.actions.setconfig([newNumClaims, newFee], {from: adminAccount});
+        assert(res.processed.receipt.status == 'executed', "setconfig() action not executed");
+
+        //assert table values
+        const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
+        assert(conf[0].fee_usd == newFee, "Incorrect fee amount");
+        assert(conf[0].max_claims_per_case == newNumClaims, "Incorrect max_claims_per_case");
     });
-
-    // it("Change Admin", async () => {
-    //     //initialize
-    //     const newAdmin = await eoslime.Account.createRandom();
-
-    //     //call setversion() on arbitration contract
-    //     const res = await arbitrationContract.actions.setadmin([newAdmin.name], {from: arbitrationAccount});
-    //     assert(res.processed.receipt.status == 'executed', "setadmin() action not executed");
-
-    //     //assert table values
-    //     const conf = await arbitrationContract.provider.select('config').from('arbitration').find();
-    //     assert(conf[0].admin == newAdmin.name, "Incorrect Admin Account");
-    // });
 
     // it("Create Task", async () => {
     //     //initialize
