@@ -14,6 +14,7 @@ describe("Arbitration Tests", function () {
     let arbitrationAccount
     let testAccount1
     let temporaryAdmin
+    let arbitrationContract
     let admin
 
     //base tester

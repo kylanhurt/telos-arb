@@ -25,7 +25,7 @@ void arbitration::init(name initial_admin) {
     //initialize
     config initial_conf;
     initial_conf.admin = initial_admin;
-		initial_conf.contract_version = "0.1.0";
+	initial_conf.contract_version = "0.1.0";
 
     //set initial config
     configs.set(initial_conf, get_self());
@@ -122,6 +122,8 @@ void arbitration::filecase(name claimant, string claim_link, std::optional<name>
 	}
 
 	check(is_account(arbitrator), "Arbitrator must be an account");
+
+	// kylan todo - should we make sure claimant, respondant, and arbitrator are all different accounts?
 
 	//Check that the claim category is valid
 	check(claim_category <= claim_category::MISC && claim_category >= claim_category::LOST_KEY_RECOVERY, "Claim category not found");
