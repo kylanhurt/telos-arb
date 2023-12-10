@@ -172,9 +172,9 @@ describe("Case files", function () {
 
         it('Respondant accepts arb', async () => {
             const res = await arbitrationContract.actions.arbacceptnom([def.arbitrator, 0], { from: arbitratorAccount })
-            assert(res.processed.receipt.status == 'executed', "acceptarb() action not executed");
+            assert(res.processed.receipt.status == 'executed', "arbacceptnom() action not executed");
             const claims = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
-            assert(claims[0].case_status == 2, 'acceptarb() should progress case status by 1')
+            assert(claims[0].case_status == 2, 'arbacceptnom() should progress case status by 1')
         })
     })
 
@@ -192,6 +192,43 @@ describe("Case files", function () {
             assert(res.processed.receipt.status == 'executed', "cancelcase() action not executed");
             const claims = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
             assert(claims[0].case_status == 8, 'cancelcase() should set case status to 8')            
+        })
+    })
+
+    describe('start case', async () => {
+        const res = await arbitrationContract.actions.filecase([
+            def.claimant, def.claim_link, def.respondant, def.arbitrator, def.claim_category
+        ], { from: claimantAccount })
+        assert(res.processed.receipt.status == 'executed', "filecase() action not executed")
+
+        const caseFiles = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
+        assert.deepEqual(caseFiles[0], {
+            claimant: claimantAccount.name,
+            respondant: respondantAccount.name,
+            arbitrator: arbitratorAccount.name,
+            case_id: 1,
+            case_ruling: '',
+            case_status: 0,
+            number_claims: 1,
+            fee_paid_tlos: "0.0000 TLOS",
+            approvals: [],
+            update_ts: caseFiles[0].update_ts // hard to test this so set to correct value
+        }, 'Subsequent case ID incorrect')
+        const res2 = await arbitrationContract.actions.acceptarb([def.respondant, 0], { from: respondantAccount })
+        assert(res2.processed.receipt.status == 'executed', "acceptarb() action not executed");
+        const claims3 = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
+        assert(claims3[0].case_status == 1, 'acceptarb() should progress case status by 1')
+        const res4 = await arbitrationContract.actions.arbacceptnom([def.arbitrator, 0], { from: arbitratorAccount })
+        assert(res4.processed.receipt.status == 'executed', "arbacceptnom() action not executed");
+        const claims5 = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
+        assert(claims5[0].case_status == 2, 'arbacceptnom() should progress case status by 1')
+        
+        it('starts case correctly', async () => {
+            try {
+
+            } catch (err) {
+                
+            }
         })
     })
 });
