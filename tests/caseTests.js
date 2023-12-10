@@ -154,4 +154,44 @@ describe("Case files", function () {
             assert(claims[0].case_status == 1, 'acceptarb() should progress case status by 1')
         })
     })
+
+    describe('Handles arbitrator acceptance by arbitrator correctly', async () => {
+        it('Non-respondant cannot accept arb', async () => {
+            try {
+                await arbitrationContract.actions.arbacceptnom([def.arbitrator, 0], { from: respondantAccount })
+            } catch (err) {
+                assert(JSON.parse(err).error.name == 'missing_auth_exception', "acceptarb() should not be accepted by non-respondant");
+            }
+            
+            try {
+                await arbitrationContract.actions.arbacceptnom([def.claimant, 0], { from: claimantAccount })
+            } catch (err) {
+                assert(JSON.parse(err).error.name == 'eosio_assert_message_exception', "acceptarb() should not be accepted by non-respondant");
+            }                
+        })
+
+        it('Respondant accepts arb', async () => {
+            const res = await arbitrationContract.actions.arbacceptnom([def.arbitrator, 0], { from: arbitratorAccount })
+            assert(res.processed.receipt.status == 'executed', "acceptarb() action not executed");
+            const claims = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
+            assert(claims[0].case_status == 2, 'acceptarb() should progress case status by 1')
+        })
+    })
+
+    describe('cancel case', async () => {
+        it('Respondant should not be able to cancel case', async () => {
+            try {
+                await arbitrationContract.actions.cancelcase([0], { from: respondantAccount })
+            } catch (err) {
+                assert(JSON.parse(err).error.name == 'missing_auth_exception', "cancelcase() should not be enacted by respondant");
+            }   
+        })
+
+        it('Claimant should be able to cancel case', async () => {
+            const res = await arbitrationContract.actions.cancelcase([0], { from: claimantAccount })
+            assert(res.processed.receipt.status == 'executed', "cancelcase() action not executed");
+            const claims = await arbitrationContract.provider.select('casefiles').from('arbitration').find();
+            assert(claims[0].case_status == 8, 'cancelcase() should set case status to 8')            
+        })
+    })
 });
